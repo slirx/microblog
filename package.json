@@ -1,0 +1,34 @@
+{
+  "name": "microblog",
+  "version": "0.0.1",
+  "main": "index.js",
+  "author": "slirx <slirx@ukr.net>",
+  "license": "MIT",
+  "private": true,
+  "scripts": {
+    "build-dev": "webpack --config webpack.dev.js",
+    "build": "webpack --config webpack.prod.js"
+  },
+  "dependencies": {
+    "normalize.css": "^8.0.1",
+    "vue": "^2.6.12",
+    "vue-router": "^3.5.1",
+    "vuex": "^3.6.2"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.14.0",
+    "@babel/preset-env": "^7.14.1",
+    "babel-loader": "^8.2.2",
+    "clean-webpack-plugin": "^4.0.0-alpha.0",
+    "css-loader": "^5.2.4",
+    "file-loader": "^6.2.0",
+    "html-loader": "^2.1.2",
+    "html-webpack-plugin": "^5.3.1",
+    "vue-loader": "^15.9.6",
+    "vue-moment": "^4.1.0",
+    "vue-template-compiler": "^2.6.12",
+    "webpack": "^5.39.1",
+    "webpack-cli": "^4.7.0",
+    "webpack-merge": "^5.7.3"
+  }
+}

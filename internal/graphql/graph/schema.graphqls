@@ -1,0 +1,34 @@
+scalar Int64
+
+type Post {
+    id: Int!
+    text: String!
+    created_at: Int64!
+}
+
+type User {
+    id: Int!
+    login: String!
+    name: String!
+    photo_url: String!
+    followers: Int!
+    following: Int!
+    followers_list: [Int!]!
+    following_list: [Int!]!
+}
+
+type Query {
+    users: [User!]!
+    user(login: String!): User!
+    posts: [Post!]!
+    post: Post!
+}
+
+input NewPost {
+    text: String!
+    userId: Int!
+}
+
+type Mutation {
+    createPost(input: NewPost!): Post!
+}
