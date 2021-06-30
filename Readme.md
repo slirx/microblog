@@ -4,15 +4,26 @@ this is my pet-project. it's kind of twitter but with very basic features. the m
 
 ## Screenshots of web interface
 
-[Imgur](https://i.imgur.com/xFSYloD.png)
 
-[Imgur](https://i.imgur.com/KZKJ10p.png)
+#### Sign In Form:
 
-[Imgur](https://i.imgur.com/ZGKCoxp.png)
+![sign in form](https://i.imgur.com/xFSYloD.png "sign in form")
 
-[Imgur](https://i.imgur.com/dUhhp1K.png)
+#### Full-Text Search:
 
-[Imgur](https://i.imgur.com/QLYZQZu.png)
+![full-text search](https://i.imgur.com/KZKJ10p.png "full-text search")
+
+#### Profile Page:
+
+![profile page](https://i.imgur.com/ZGKCoxp.png "profile page")
+
+#### Followers Page:
+
+![followers page](https://i.imgur.com/dUhhp1K.png "followers page")
+
+#### Profile Edit Page:
+
+![profile edit page](https://i.imgur.com/QLYZQZu.png "profile edit page")
 
 ## TODO
 
