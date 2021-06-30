@@ -1,6 +1,18 @@
 # MicroBlog (WIP)
 
-this is my pet-project.
+this is my pet-project. it's kind of twitter but with very basic features. the main reasons for creating it is to play with some technologies and give you an example of my code.
+
+## Screenshots of web interface
+
+[Imgur](https://i.imgur.com/xFSYloD.png)
+
+[Imgur](https://i.imgur.com/KZKJ10p.png)
+
+[Imgur](https://i.imgur.com/ZGKCoxp.png)
+
+[Imgur](https://i.imgur.com/dUhhp1K.png)
+
+[Imgur](https://i.imgur.com/QLYZQZu.png)
 
 ## TODO
 
