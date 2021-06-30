@@ -10,9 +10,6 @@
             <router-link :to="'/user/' + currentUser.login">profile</router-link>
           </li>
           <li>
-            <router-link to="/bookmarks">bookmarks</router-link>
-          </li>
-          <li>
             <router-link to="/search">search</router-link>
           </li>
           <li><a href="#" v-on:click="logout">logout</a></li>

@@ -4,7 +4,6 @@ import VueMoment from 'vue-moment'
 import App from '../vue/App.vue'
 import Home from '../vue/Home.vue'
 import Profile from '../vue/Profile.vue'
-import Bookmarks from "../vue/Bookmarks.vue";
 import Following from "../vue/Following.vue";
 import Followers from "../vue/Followers.vue";
 import ProfileEdit from "../vue/ProfileEdit.vue";
@@ -76,7 +75,6 @@ const routes = [
     {path: '/user/:login', component: Profile},
     {path: '/user/:login/following', component: Following},
     {path: '/user/:login/followers', component: Followers},
-    {path: '/bookmarks', component: Bookmarks},
     {path: '/search', component: Search}
     // path: '*' todo add 404 page
 ]
