@@ -1,3 +1,6 @@
 .idea
+.run
 web/generated
 node_modules
+web/images/media/user/*
+build/microblog/elk/filebeat/log/*
