@@ -2,6 +2,7 @@ package main
 
 import (
 	"os"
+	"strings"
 )
 
 // Config represents combined configuration.
@@ -19,6 +20,8 @@ type Server struct {
 	// Addr represents address and port which server should listen to. It's specified in format host:port.
 	Addr string
 	JWT  JWT
+	// CORSAllowedOrigins is a list of origins a cross-domain request can be executed from.
+	CORSAllowedOrigins []string
 }
 
 // NewConfig returns initialized instance of configuration. It reads configuration from environment variables.
@@ -28,6 +31,17 @@ func NewConfig(prefix string) (*Config, error) {
 	internalSecrets["user"] = []byte(os.Getenv(prefix + "SERVER_JWT_INTERNAL_USER_SECRET"))
 	//internalSecrets["graphql"] = []byte(os.Getenv(prefix + "SERVER_JWT_INTERNAL_GRAPHQL_SECRET"))
 
+	corsAllowedOrigins := make([]string, 0)
+	tmpAllowedOrigins := strings.Split(os.Getenv(prefix+"SERVER_CORS_ALLOWED_ORIGINS"), ",")
+	for _, origin := range tmpAllowedOrigins {
+		origin = strings.TrimSpace(origin)
+		if origin == "" {
+			continue
+		}
+
+		corsAllowedOrigins = append(corsAllowedOrigins, origin)
+	}
+
 	config := Config{
 		Server: Server{
 			Addr: os.Getenv(prefix + "SERVER_ADDR"),
@@ -35,6 +49,7 @@ func NewConfig(prefix string) (*Config, error) {
 				Secret:          []byte(os.Getenv(prefix + "SERVER_JWT_SECRET")),
 				InternalSecrets: internalSecrets,
 			},
+			CORSAllowedOrigins: corsAllowedOrigins,
 		},
 	}
 

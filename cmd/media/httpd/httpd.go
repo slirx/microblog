@@ -50,7 +50,7 @@ func main() {
 	router := chi.NewRouter()
 
 	router.Use(cors.Handler(cors.Options{
-		AllowedOrigins:   []string{"http://microblog.local:8001*"}, // todo move domain to config
+		AllowedOrigins:   conf.Server.CORSAllowedOrigins,
 		AllowedMethods:   []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
 		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
 		ExposedHeaders:   []string{"Link"},
@@ -104,8 +104,6 @@ func main() {
 	workDir, _ := os.Getwd()
 	filesDir := http.Dir(filepath.Join(workDir, "web/images/media"))
 	fileServer(router, "/media/image/*", filesDir)
-
-	// todo add file server: http.Handle("/web/", http.StripPrefix("/web/", http.FileServer(http.Dir("web"))))
 
 	server := http.Server{
 		Addr:    conf.Server.Addr,

@@ -13,8 +13,7 @@ export default {
                     method: "GET",
                     headers: {
                         'Authorization': accessToken
-                    },
-                    credentials: "same-origin" // todo wtf?
+                    }
                 }).then((response) => {
                     if (response.status === 403) {
                         localStorage.removeItem("jwt")
@@ -66,7 +65,6 @@ export default {
                     headers: {
                         'Authorization': accessToken
                     },
-                    credentials: "same-origin",
                     body: formData
                 }).then((response) => {
                     if (!response.ok) {

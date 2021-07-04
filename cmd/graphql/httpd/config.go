@@ -2,6 +2,7 @@ package main
 
 import (
 	"os"
+	"strings"
 
 	"gitlab.com/slirx/newproj/internal/api"
 	"gitlab.com/slirx/newproj/pkg/rabbitmq"
@@ -25,6 +26,8 @@ type Server struct {
 	Addr          string
 	JWT           JWT
 	ServiceConfig api.ServiceConfig
+	// CORSAllowedOrigins is a list of origins a cross-domain request can be executed from.
+	CORSAllowedOrigins []string
 }
 
 // NewConfig returns initialized instance of configuration. It reads configuration from environment variables.
@@ -46,6 +49,17 @@ func NewConfig(prefix string) (*Config, error) {
 	endpoints["auth"] = os.Getenv(prefix + "ENDPOINT_AUTH")
 	endpoints["user"] = os.Getenv(prefix + "ENDPOINT_USER")
 
+	corsAllowedOrigins := make([]string, 0)
+	tmpAllowedOrigins := strings.Split(os.Getenv(prefix+"SERVER_CORS_ALLOWED_ORIGINS"), ",")
+	for _, origin := range tmpAllowedOrigins {
+		origin = strings.TrimSpace(origin)
+		if origin == "" {
+			continue
+		}
+
+		corsAllowedOrigins = append(corsAllowedOrigins, origin)
+	}
+
 	config := Config{
 		EnvoyURL: os.Getenv(prefix + "ENVOY_URL"),
 		Server: Server{
@@ -60,6 +74,7 @@ func NewConfig(prefix string) (*Config, error) {
 					Password: os.Getenv(prefix + "SERVER_JWT_INTERNAL_PASSWORD"),
 				},
 			},
+			CORSAllowedOrigins: corsAllowedOrigins,
 		},
 		Endpoints: endpoints,
 		//RabbitMQ: rabbitmq.Config{
