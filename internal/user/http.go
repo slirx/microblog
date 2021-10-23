@@ -26,6 +26,7 @@ type Handler interface {
 	Following(w http.ResponseWriter, r *http.Request)
 	InternalFollowers(w http.ResponseWriter, r *http.Request)
 	InternalUsers(w http.ResponseWriter, r *http.Request)
+	InternalGet(w http.ResponseWriter, r *http.Request)
 }
 
 type handler struct {
@@ -226,14 +227,41 @@ func (h handler) InternalUsers(w http.ResponseWriter, r *http.Request) {
 		ids = append(ids, id)
 	}
 
-	if len(ids) == 0 {
-		err := api.NewRequestError(errors.New("no user ids"))
+	//if len(ids) == 0 {
+	//	err := api.NewRequestError(errors.New("no user ids"))
+	//	h.Logger.Error(err, apmzap.TraceContext(ctx)...)
+	//	h.ResponseBuilder.ErrorResponse(ctx, w, err)
+	//	return
+	//}
+
+	latestUserID, _ := strconv.Atoi(r.URL.Query().Get("latest_user_id"))
+	request := InternalUsersRequest{
+		UserIDs:      ids,
+		LatestUserID: latestUserID,
+	}
+
+	response, err := h.Service.InternalUsers(ctx, request)
+	if err != nil {
 		h.Logger.Error(err, apmzap.TraceContext(ctx)...)
 		h.ResponseBuilder.ErrorResponse(ctx, w, err)
 		return
 	}
 
-	response, err := h.Service.InternalUsers(ctx, ids)
+	h.ResponseBuilder.DataResponse(ctx, w, response)
+}
+
+func (h handler) InternalGet(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	login := chi.URLParam(r, "login")
+	if login == "" {
+		err := api.NewRequestError(errors.New("invalid login"))
+		h.Logger.Error(err, apmzap.TraceContext(ctx)...)
+		h.ResponseBuilder.ErrorResponse(ctx, w, err)
+		return
+	}
+
+	response, err := h.Service.InternalGet(ctx, login)
 	if err != nil {
 		h.Logger.Error(err, apmzap.TraceContext(ctx)...)
 		h.ResponseBuilder.ErrorResponse(ctx, w, err)

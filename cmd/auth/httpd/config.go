@@ -33,8 +33,13 @@ type Database struct {
 type Server struct {
 	// Addr represents address and port which server should listen to. It's specified in format host:port.
 	Addr string
+	// AdminAddr represents address and port which server should listen to. It's specified in format host:port.
+	// It's used for admin panel.
+	AdminAddr string
 	// CORSAllowedOrigins is a list of origins a cross-domain request can be executed from.
 	CORSAllowedOrigins []string
+	// AdminCORSAllowedOrigins is a list of origins a cross-domain request can be executed from (for admin panel).
+	AdminCORSAllowedOrigins []string
 }
 
 // NewConfig returns initialized instance of configuration. It reads configuration from environment variables.
@@ -75,10 +80,23 @@ func NewConfig(prefix string) (*Config, error) {
 		corsAllowedOrigins = append(corsAllowedOrigins, origin)
 	}
 
+	adminCORSAllowedOrigins := make([]string, 0)
+	tmpAllowedOrigins = strings.Split(os.Getenv(prefix+"SERVER_ADMIN_CORS_ALLOWED_ORIGINS"), ",")
+	for _, origin := range tmpAllowedOrigins {
+		origin = strings.TrimSpace(origin)
+		if origin == "" {
+			continue
+		}
+
+		adminCORSAllowedOrigins = append(adminCORSAllowedOrigins, origin)
+	}
+
 	config := Config{
 		Server: Server{
-			Addr:               os.Getenv(prefix + "SERVER_ADDR"),
-			CORSAllowedOrigins: corsAllowedOrigins,
+			Addr:                    os.Getenv(prefix + "SERVER_ADDR"),
+			AdminAddr:               os.Getenv(prefix + "SERVER_ADMIN_ADDR"),
+			CORSAllowedOrigins:      corsAllowedOrigins,
+			AdminCORSAllowedOrigins: adminCORSAllowedOrigins,
 		},
 		RabbitMQ: rabbitmq.Config{
 			URI:                     os.Getenv(prefix + "RABBITMQ_AMQP_URI"),

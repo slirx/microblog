@@ -67,11 +67,11 @@ func main() {
 	router.Post(
 		"/graphql",
 		apmmiddleware.Wrap(
-			jwtmiddleware.Wrap(
+			jwtmiddleware.WrapInternal(
 				handler.ServeHTTP,
 				responseBuilder,
 				zapLogger,
-				conf.Server.JWT.Secret,
+				conf.Server.JWT.InternalSecrets,
 			),
 			"/graphql",
 			apmmiddleware.WithTracer(apmTracer),

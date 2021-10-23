@@ -82,3 +82,15 @@ type User struct {
 	Following uint   `json:"following,omitempty"`
 	Followers uint   `json:"followers,omitempty"`
 }
+
+// InternalUsersRequest is used for request in InternalUsers service.
+type InternalUsersRequest struct {
+	UserIDs      []int
+	LatestUserID int
+}
+
+// InternalUsersResponse is used for response in InternalUsers service.
+type InternalUsersResponse struct {
+	Total int    `json:"total"`
+	Users []User `json:"users"`
+}

@@ -3,6 +3,7 @@ package graphql
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"time"
 
@@ -17,7 +18,8 @@ type Service struct {
 }
 
 type UserService interface {
-	Get(ctx context.Context, login string) (*model.User, error)
+	User(ctx context.Context, login string) (*model.User, error)
+	Users(ctx context.Context, latestUserID int) (*model.UsersResponse, error)
 }
 
 func NewService(endpoints map[string]string, config *api.ServiceConfig) (*Service, error) {
@@ -53,13 +55,39 @@ type GetUserResponse struct {
 	Data model.User `json:"data"`
 }
 
-func (a userAPI) Get(ctx context.Context, login string) (*model.User, error) {
+type GetUsersResponse struct {
+	Data model.UsersResponse `json:"data"`
+}
+
+func (a userAPI) User(ctx context.Context, login string) (*model.User, error) {
 	body, err := a.SendRequest(ctx, "user", "GET", "internal/user/"+login, nil)
 	if err != nil {
 		return nil, err
 	}
 
 	response := GetUserResponse{}
+	if err = json.Unmarshal(body, &response); err != nil {
+		return nil, errors.WithStack(err)
+	}
+
+	// todo handle error. for example where there are no data field in response and we've got 500 error
+
+	return &response.Data, nil
+}
+
+func (a userAPI) Users(ctx context.Context, latestUserID int) (*model.UsersResponse, error) {
+	body, err := a.SendRequest(
+		ctx,
+		"user",
+		"GET",
+		fmt.Sprintf("internal/user?latest_user_id=%d", latestUserID),
+		nil,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	response := GetUsersResponse{}
 	if err = json.Unmarshal(body, &response); err != nil {
 		return nil, errors.WithStack(err)
 	}

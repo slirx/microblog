@@ -49,3 +49,14 @@ type InternalAuth struct {
 	Password    string
 	CreatedAt   time.Time
 }
+
+// AdminLoginRequest represents fields of login request.
+type AdminLoginRequest struct {
+	Login    string `json:"login"`
+	Password string `json:"password"`
+}
+
+// AdminLoginResponse represents fields of login response.
+type AdminLoginResponse struct {
+	AccessToken string `json:"access_token"`
+}

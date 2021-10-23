@@ -17,7 +17,8 @@ type Config struct {
 }
 
 type JWT struct {
-	Secret []byte
+	Secret          []byte
+	InternalSecrets map[string][]byte // JWT secrets for microservices (service-to-service communication)
 }
 
 // Server represents web server configuration.
@@ -49,6 +50,9 @@ func NewConfig(prefix string) (*Config, error) {
 	endpoints["auth"] = os.Getenv(prefix + "ENDPOINT_AUTH")
 	endpoints["user"] = os.Getenv(prefix + "ENDPOINT_USER")
 
+	internalSecrets := make(map[string][]byte)
+	internalSecrets["graphql"] = []byte(os.Getenv(prefix + "SERVER_JWT_INTERNAL_GRAPHQL_SECRET"))
+
 	corsAllowedOrigins := make([]string, 0)
 	tmpAllowedOrigins := strings.Split(os.Getenv(prefix+"SERVER_CORS_ALLOWED_ORIGINS"), ",")
 	for _, origin := range tmpAllowedOrigins {
@@ -65,7 +69,8 @@ func NewConfig(prefix string) (*Config, error) {
 		Server: Server{
 			Addr: os.Getenv(prefix + "SERVER_ADDR"),
 			JWT: JWT{
-				Secret: []byte(os.Getenv(prefix + "SERVER_JWT_SECRET")),
+				Secret:          []byte(os.Getenv(prefix + "SERVER_JWT_SECRET")),
+				InternalSecrets: internalSecrets,
 			},
 			ServiceConfig: api.ServiceConfig{
 				InternalJWT: api.InternalJWT{

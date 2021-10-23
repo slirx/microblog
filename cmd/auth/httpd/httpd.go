@@ -105,6 +105,34 @@ func main() {
 		_ = server.ListenAndServe()
 	}()
 
+	routerAdmin := chi.NewRouter()
+	routerAdmin.Use(cors.Handler(cors.Options{
+		AllowedOrigins:   conf.Server.AdminCORSAllowedOrigins,
+		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
+		ExposedHeaders:   []string{"Link"},
+		AllowCredentials: false,
+		MaxAge:           300,
+	}))
+	routerAdmin.Post(
+		"/auth/admin/login",
+		apmmiddleware.Wrap(
+			handler.AdminLogin,
+			"/auth/admin/login",
+			apmmiddleware.WithTracer(apmTracer),
+			apmmiddleware.WithRecovery(recoveryFunc),
+		),
+	)
+
+	serverAdmin := http.Server{
+		Addr:    conf.Server.AdminAddr,
+		Handler: routerAdmin,
+	}
+
+	go func() {
+		_ = serverAdmin.ListenAndServe()
+	}()
+
 	zapLogger.Debug("started")
 
 	<-ctx.Done()

@@ -27,3 +27,8 @@ type User struct {
 	FollowersList []int  `json:"followers_list"`
 	FollowingList []int  `json:"following_list"`
 }
+
+type UsersResponse struct {
+	Total int     `json:"total"`
+	Users []*User `json:"users"`
+}

@@ -166,7 +166,7 @@ func main() {
 		"/internal/user/{login}",
 		apmmiddleware.Wrap(
 			jwtmiddleware.WrapInternal(
-				handler.Get, // todo use InternalGet?
+				handler.InternalGet,
 				responseBuilder,
 				zapLogger,
 				conf.Server.JWT.InternalSecrets,

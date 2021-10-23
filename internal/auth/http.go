@@ -18,6 +18,8 @@ type Handler interface {
 	Login(w http.ResponseWriter, r *http.Request)
 	// InternalLogin checks login/password and returns JWT. It's used for service-to-service authorization.
 	InternalLogin(w http.ResponseWriter, r *http.Request)
+	// AdminLogin checks login/password and returns JWT. It's used for admin panel.
+	AdminLogin(w http.ResponseWriter, r *http.Request)
 }
 
 type handler struct {
@@ -58,6 +60,27 @@ func (h handler) InternalLogin(w http.ResponseWriter, r *http.Request) {
 	}
 
 	response, err := h.Service.InternalLogin(r.Context(), request)
+	if err != nil {
+		h.Logger.Error(err, apmzap.TraceContext(ctx)...)
+		h.ResponseBuilder.ErrorResponse(ctx, w, err)
+		return
+	}
+
+	h.ResponseBuilder.DataResponse(ctx, w, response)
+}
+
+// AdminLogin checks login/password and returns JWT.
+func (h handler) AdminLogin(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	request := AdminLoginRequest{}
+
+	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
+		h.Logger.Error(err, apmzap.TraceContext(ctx)...)
+		h.ResponseBuilder.ErrorResponse(ctx, w, api.RequestError)
+		return
+	}
+
+	response, err := h.Service.AdminLogin(r.Context(), request)
 	if err != nil {
 		h.Logger.Error(err, apmzap.TraceContext(ctx)...)
 		h.ResponseBuilder.ErrorResponse(ctx, w, err)

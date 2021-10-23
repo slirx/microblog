@@ -12,15 +12,16 @@ import (
 )
 
 func (r *mutationResolver) CreatePost(ctx context.Context, input model.NewPost) (*model.Post, error) {
+	// todo implement
 	panic(fmt.Errorf("not implemented"))
 }
 
-func (r *queryResolver) Users(ctx context.Context) ([]*model.User, error) {
-	panic(fmt.Errorf("not implemented"))
+func (r *queryResolver) Users(ctx context.Context, latestUserID int) (*model.UsersResponse, error) {
+	return r.Service.UserService.Users(ctx, latestUserID)
 }
 
 func (r *queryResolver) User(ctx context.Context, login string) (*model.User, error) {
-	return r.Service.UserService.Get(ctx, login)
+	return r.Service.UserService.User(ctx, login)
 }
 
 func (r *queryResolver) Posts(ctx context.Context) ([]*model.Post, error) {

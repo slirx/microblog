@@ -21,7 +21,7 @@ type Repository interface {
 	Followers(ctx context.Context, request FollowersRequest, perPage uint8) (*FollowersResponse, error)
 	Following(ctx context.Context, request FollowingRequest, perPage uint8) (*FollowingResponse, error)
 	FollowersIDs(ctx context.Context, uid int) ([]int, error)
-	Users(ctx context.Context, userIDs []int) ([]User, error)
+	Users(ctx context.Context, request InternalUsersRequest, perPage int) (*InternalUsersResponse, error)
 }
 
 type repository struct {
@@ -328,12 +328,41 @@ func (r repository) FollowersIDs(ctx context.Context, uid int) ([]int, error) {
 	return response, nil
 }
 
-func (r repository) Users(ctx context.Context, userIDs []int) ([]User, error) {
-	response := make([]User, 0)
+func (r repository) Users(ctx context.Context, request InternalUsersRequest, perPage int) (*InternalUsersResponse, error) {
+	response := &InternalUsersResponse{
+		Total: 0,
+		Users: make([]User, 0),
+	}
 
-	rows, err := r.db.QueryContext(ctx, `SELECT id, name, login FROM "user" WHERE id = ANY($1)`, pq.Array(userIDs))
-	if err != nil {
-		return response, errors.WithStack(err)
+	var rows *sql.Rows
+	var err error
+
+	if len(request.UserIDs) != 0 {
+		// fetch users by IDs
+		rows, err = r.db.QueryContext(
+			ctx,
+			`SELECT id, name, login FROM "user" WHERE id = ANY($1)`,
+			pq.Array(request.UserIDs),
+		)
+		if err != nil {
+			return response, errors.WithStack(err)
+		}
+	} else {
+		err = r.db.QueryRowContext(ctx, `SELECT COUNT(1) FROM "user"`).Scan(&response.Total)
+		if err != nil {
+			return response, errors.WithStack(err)
+		}
+
+		// fetch all users (with pagination)
+		rows, err = r.db.QueryContext(
+			ctx,
+			`SELECT id, name, login FROM "user" WHERE id < $1 ORDER BY id DESC LIMIT $2`,
+			request.LatestUserID,
+			perPage,
+		)
+		if err != nil {
+			return response, errors.WithStack(err)
+		}
 	}
 
 	defer rows.Close()
@@ -344,7 +373,7 @@ func (r repository) Users(ctx context.Context, userIDs []int) ([]User, error) {
 			return response, errors.WithStack(err)
 		}
 
-		response = append(response, u)
+		response.Users = append(response.Users, u)
 	}
 
 	if err = rows.Err(); err != nil {

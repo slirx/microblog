@@ -14,6 +14,10 @@ import (
 	"gitlab.com/slirx/newproj/pkg/tracer"
 )
 
+const (
+	usersPerPage = 20
+)
+
 type Service interface {
 	Update(ctx context.Context, request UpdateRequest) (string, error)
 	Get(ctx context.Context, login string) (*GetResponse, error)
@@ -23,7 +27,8 @@ type Service interface {
 	Followers(ctx context.Context, request FollowersRequest) (*FollowersResponse, error)
 	Following(ctx context.Context, request FollowingRequest) (*FollowingResponse, error)
 	InternalFollowers(ctx context.Context, uid int) ([]int, error)
-	InternalUsers(ctx context.Context, userIDs []int) ([]User, error)
+	InternalUsers(ctx context.Context, request InternalUsersRequest) (*InternalUsersResponse, error)
+	InternalGet(ctx context.Context, login string) (*GetResponse, error)
 }
 
 type service struct {
@@ -62,14 +67,12 @@ func (s service) Get(ctx context.Context, login string) (*GetResponse, error) {
 	}
 
 	var images map[int]string
-	images, err = s.InternalMediaAPI.Images(ctx, "user", []int{int(response.ID)})
+	images, err = s.InternalMediaAPI.Images(ctx, "user", []int{response.ID})
 	if err != nil {
 		return nil, err
 	}
 
-	response.PhotoURL = images[int(response.ID)]
-
-	//response.PhotoURL = "https://i.imgur.com/ilf6CPH.png"
+	response.PhotoURL = images[response.ID]
 
 	return response, nil
 }
@@ -93,7 +96,7 @@ func (s service) Me(ctx context.Context) (*MeResponse, error) {
 		return nil, err
 	}
 
-	response.PhotoURL = images[int(uid)]
+	response.PhotoURL = images[uid]
 
 	//response.PhotoURL = "https://i.imgur.com/ilf6CPH.png"
 
@@ -209,10 +212,15 @@ func (s service) InternalFollowers(ctx context.Context, uid int) ([]int, error) 
 	return response, nil
 }
 
-func (s service) InternalUsers(ctx context.Context, userIDs []int) ([]User, error) {
-	response, err := s.Repository.Users(ctx, userIDs)
+func (s service) InternalUsers(ctx context.Context, request InternalUsersRequest) (*InternalUsersResponse, error) {
+	response, err := s.Repository.Users(ctx, request, usersPerPage)
 	if err != nil {
 		return response, err
+	}
+
+	userIDs := make([]int, 0)
+	for _, user := range response.Users {
+		userIDs = append(userIDs, user.ID)
 	}
 
 	var images map[int]string
@@ -221,9 +229,30 @@ func (s service) InternalUsers(ctx context.Context, userIDs []int) ([]User, erro
 		return nil, err
 	}
 
-	for i, user := range response {
-		response[i].PhotoURL = images[user.ID]
+	for i, user := range response.Users {
+		response.Users[i].PhotoURL = images[user.ID]
 	}
+
+	return response, nil
+}
+
+func (s service) InternalGet(ctx context.Context, login string) (*GetResponse, error) {
+	response, err := s.Repository.Get(ctx, login, 0)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, api.NewNotFoundError(errors.New("user not found"))
+		}
+
+		return nil, err
+	}
+
+	var images map[int]string
+	images, err = s.InternalMediaAPI.Images(ctx, "user", []int{response.ID})
+	if err != nil {
+		return nil, err
+	}
+
+	response.PhotoURL = images[response.ID]
 
 	return response, nil
 }

@@ -18,7 +18,8 @@ type serviceMock struct {
 	FollowersFn         func(ctx context.Context, request FollowersRequest) (*FollowersResponse, error)
 	FollowingFn         func(ctx context.Context, request FollowingRequest) (*FollowingResponse, error)
 	InternalFollowersFn func(ctx context.Context, uid int) ([]int, error)
-	InternalUsersFn     func(ctx context.Context, userIDs []int) ([]User, error)
+	InternalUsersFn     func(ctx context.Context, request InternalUsersRequest) (*InternalUsersResponse, error)
+	InternalGetFn       func(ctx context.Context, login string) (*GetResponse, error)
 }
 
 func (s serviceMock) Get(ctx context.Context, login string) (*GetResponse, error) {
@@ -49,8 +50,12 @@ func (s serviceMock) InternalFollowers(ctx context.Context, uid int) ([]int, err
 	return s.InternalFollowersFn(ctx, uid)
 }
 
-func (s serviceMock) InternalUsers(ctx context.Context, userIDs []int) ([]User, error) {
-	return s.InternalUsersFn(ctx, userIDs)
+func (s serviceMock) InternalUsers(ctx context.Context, request InternalUsersRequest) (*InternalUsersResponse, error) {
+	return s.InternalUsersFn(ctx, request)
+}
+
+func (s serviceMock) InternalGet(ctx context.Context, login string) (*GetResponse, error) {
+	return s.InternalGetFn(ctx, login)
 }
 
 type repositoryMock struct {
@@ -63,7 +68,7 @@ type repositoryMock struct {
 	FollowersFn    func(ctx context.Context, request FollowersRequest, perPage uint8) (*FollowersResponse, error)
 	FollowersIDsFn func(ctx context.Context, uid int) ([]int, error)
 	FollowingFn    func(ctx context.Context, request FollowingRequest, perPage uint8) (*FollowingResponse, error)
-	UsersFn        func(ctx context.Context, userIDs []int) ([]User, error)
+	UsersFn        func(ctx context.Context, request InternalUsersRequest, perPage int) (*InternalUsersResponse, error)
 }
 
 func (s serviceMock) Update(ctx context.Context, request UpdateRequest) (string, error) {
@@ -106,6 +111,6 @@ func (r repositoryMock) Following(ctx context.Context, request FollowingRequest,
 	return r.FollowingFn(ctx, request, perPage)
 }
 
-func (r repositoryMock) Users(ctx context.Context, userIDs []int) ([]User, error) {
-	return r.UsersFn(ctx, userIDs)
+func (r repositoryMock) Users(ctx context.Context, request InternalUsersRequest, perPage int) (*InternalUsersResponse, error) {
+	return r.UsersFn(ctx, request, perPage)
 }

@@ -2,20 +2,27 @@ import Vue from 'vue'
 import VueRouter from 'vue-router'
 import VueMoment from 'vue-moment'
 import App from '../vue/App.vue'
-import Home from '../vue/Home.vue'
-import Profile from '../vue/Profile.vue'
-import Following from "../vue/Following.vue";
-import Followers from "../vue/Followers.vue";
-import ProfileEdit from "../vue/ProfileEdit.vue";
-import Search from "../vue/Search.vue"
+import Users from '../vue/Users.vue'
 import http from './http.js'
 import Vuex from 'vuex'
 import "normalize.css"
 import "../css/style.css"
+import VueApollo from 'vue-apollo'
+import ApolloClient from 'apollo-boost'
 
 Vue.use(VueRouter);
 Vue.use(Vuex);
 Vue.use(VueMoment);
+Vue.use(VueApollo);
+
+const apolloClient = new ApolloClient({
+    // You should use an absolute URL here
+    uri: 'http://microblog.local:8080/graphql'
+})
+
+const apolloProvider = new VueApollo({
+    defaultClient: apolloClient,
+})
 
 const store = new Vuex.Store({
     state: {
@@ -69,12 +76,12 @@ const store = new Vuex.Store({
 Vue.use(http, {store})
 
 const routes = [
-    {path: '/', component: Home},
-    {path: '/user/edit', component: ProfileEdit},
-    {path: '/user/:login', component: Profile},
-    {path: '/user/:login/following', component: Following},
-    {path: '/user/:login/followers', component: Followers},
-    {path: '/search', component: Search}
+    {path: '/users', component: Users},
+    // {path: '/user/edit', component: ProfileEdit},
+    // {path: '/user/:login', component: Profile},
+    // {path: '/user/:login/following', component: Following},
+    // {path: '/user/:login/followers', component: Followers},
+    // {path: '/search', component: Search}
     // path: '*' todo add 404 page
 ]
 
@@ -87,6 +94,7 @@ const app = new Vue({
     el: "#app",
     store,
     router,
+    apolloProvider,
     template: '<App/>',
     components: {
         App

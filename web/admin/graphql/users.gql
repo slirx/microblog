@@ -1,0 +1,11 @@
+query ($latestUserID: Int!) {
+    users(latestUserID: $latestUserID) {
+        total,
+        users {
+            id
+            login
+            name
+            photo_url
+        }
+    }
+}

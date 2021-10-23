@@ -17,8 +17,13 @@ type User {
     following_list: [Int!]!
 }
 
-type Query {
+type UsersResponse {
+    total: Int!
     users: [User!]!
+}
+
+type Query {
+    users (latestUserID: Int!): UsersResponse!
     user(login: String!): User!
     posts: [Post!]!
     post: Post!

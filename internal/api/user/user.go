@@ -26,8 +26,13 @@ type followersResponse struct {
 	Data []int `json:"data"`
 }
 
+type usersDataResponse struct {
+	Total int          `json:"total"`
+	Users []model.User `json:"users"`
+}
+
 type usersResponse struct {
-	Data []model.User `json:"data"`
+	Data usersDataResponse `json:"data"`
 }
 
 func (u userAPI) Followers(ctx context.Context, uid int) ([]int, error) {
@@ -76,7 +81,7 @@ func (u userAPI) Users(ctx context.Context, userIDs []int) ([]model.User, error)
 		return nil, errors.WithStack(err)
 	}
 
-	return response.Data, nil
+	return response.Data.Users, nil
 }
 
 func NewAPI(endpoints map[string]string, config *api.ServiceConfig) (API, error) {
